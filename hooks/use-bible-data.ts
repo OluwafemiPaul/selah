@@ -10,6 +10,7 @@ interface UseBibleDataReturn {
   loadVerses: (chapterId: number) => Promise<VerseRef[]>;
   searchVerses: (query: string) => Promise<VerseRef[]>;
   getVerse: (bookId: number, chapter: number, verse: number) => Promise<VerseRef | null>;
+  getVersesByIds: (ids: number[]) => Promise<VerseRef[]>;
 }
 
 export function useBibleData(): UseBibleDataReturn {
@@ -53,6 +54,7 @@ export function useBibleData(): UseBibleDataReturn {
         [chapterId]
       );
       return rows.map(r => ({
+        id: r.id,
         book: {
           id: r.book_id,
           name: r.book_name,
@@ -103,6 +105,7 @@ export function useBibleData(): UseBibleDataReturn {
       );
 
       return rows.map(r => ({
+        id: r.verse_id,
         book: {
           id: r.book_id,
           name: r.book_name,
@@ -140,6 +143,7 @@ export function useBibleData(): UseBibleDataReturn {
 
       const book = BOOKS.find(b => b.id === bookId)!;
       return {
+        id: row.id,
         book,
         chapter,
         verse,
@@ -150,5 +154,46 @@ export function useBibleData(): UseBibleDataReturn {
     [db]
   );
 
-  return { books, loadChapters, loadVerses, searchVerses, getVerse };
+  const getVersesByIds = useCallback(
+    async (ids: number[]): Promise<VerseRef[]> => {
+      if (!db || ids.length === 0) return [];
+      const placeholders = ids.map(() => '?').join(', ');
+      const rows = await db.getAllAsync<{
+        id: number;
+        book_id: number;
+        number: number;
+        text: string;
+        book_name: string;
+        book_abbrev: string;
+        book_testament: string;
+        chapter_number: number;
+      }>(
+        `SELECT v.id, v.book_id, v.number, v.text,
+                b.name AS book_name, b.abbrev AS book_abbrev, b.testament AS book_testament,
+                c.number AS chapter_number
+         FROM verses v
+         JOIN books b ON v.book_id = b.id
+         JOIN chapters c ON v.chapter_id = c.id
+         WHERE v.id IN (${placeholders})
+         ORDER BY v.book_id, c.number, v.number`,
+        ids
+      );
+      return rows.map(r => ({
+        id: r.id,
+        book: {
+          id: r.book_id,
+          name: r.book_name,
+          abbrev: r.book_abbrev,
+          testament: r.book_testament as 'OT' | 'NT',
+        },
+        chapter: r.chapter_number,
+        verse: r.number,
+        text: r.text,
+        reference: `${r.book_name} ${r.chapter_number}:${r.number}`,
+      }));
+    },
+    [db]
+  );
+
+  return { books, loadChapters, loadVerses, searchVerses, getVerse, getVersesByIds };
 }

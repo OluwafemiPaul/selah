@@ -28,6 +28,10 @@ export default function BibleScreen() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [verses, setVerses] = useState<VerseRef[]>([]);
 
+  // Multi-verse selection
+  const [selectedVerses, setSelectedVerses] = useState<VerseRef[]>([]);
+  const selectedIds = new Set(selectedVerses.map(v => v.id));
+
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Debounced search
@@ -53,9 +57,15 @@ export default function BibleScreen() {
     };
   }, [query, searchVerses]);
 
+  // Clear selection when entering search mode
+  useEffect(() => {
+    setSelectedVerses([]);
+  }, [isSearchMode]);
+
   const handleSelectBook = useCallback(
     async (book: Book) => {
       setSelectedBook(book);
+      setSelectedVerses([]);
       const loaded = await loadChapters(book.id);
       setChapters(loaded);
       setLevel('chapters');
@@ -66,6 +76,7 @@ export default function BibleScreen() {
   const handleSelectChapter = useCallback(
     async (chapter: Chapter) => {
       setSelectedChapter(chapter);
+      setSelectedVerses([]);
       const loaded = await loadVerses(chapter.id);
       setVerses(loaded);
       setLevel('verses');
@@ -73,10 +84,17 @@ export default function BibleScreen() {
     [loadVerses]
   );
 
-  function handleSelectVerse(verse: VerseRef) {
-    router.push(
-      `/meditation/new?bookId=${verse.book.id}&chapter=${verse.chapter}&verse=${verse.verse}`
-    );
+  function handleToggleVerse(verse: VerseRef) {
+    setSelectedVerses(prev => {
+      const exists = prev.some(v => v.id === verse.id);
+      return exists ? prev.filter(v => v.id !== verse.id) : [...prev, verse];
+    });
+  }
+
+  function handleConfirmSelection() {
+    if (selectedVerses.length === 0) return;
+    const ids = selectedVerses.map(v => v.id).join(',');
+    router.push(`/meditation/new?verseIds=${ids}`);
   }
 
   function handleClearSearch() {
@@ -101,7 +119,9 @@ export default function BibleScreen() {
             results={searchResults}
             isLoading={isSearching}
             query={query}
-            onSelectVerse={handleSelectVerse}
+            selectedIds={selectedIds}
+            onToggleVerse={handleToggleVerse}
+            onConfirm={handleConfirmSelection}
           />
         ) : level === 'books' ? (
           <BookList onSelectBook={handleSelectBook} />
@@ -117,8 +137,13 @@ export default function BibleScreen() {
             book={selectedBook}
             chapter={selectedChapter}
             verses={verses}
-            onSelectVerse={handleSelectVerse}
-            onBack={() => setLevel('chapters')}
+            selectedIds={selectedIds}
+            onToggleVerse={handleToggleVerse}
+            onConfirm={handleConfirmSelection}
+            onBack={() => {
+              setSelectedVerses([]);
+              setLevel('chapters');
+            }}
           />
         ) : null}
       </View>

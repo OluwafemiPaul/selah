@@ -21,6 +21,7 @@ export interface Verse {
 }
 
 export interface VerseRef {
+  id: number; // DB verse ID
   book: Book;
   chapter: number;
   verse: number;

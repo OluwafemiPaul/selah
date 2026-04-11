@@ -16,6 +16,7 @@ import { useBibleData } from '@/hooks/use-bible-data';
 import type { CreateMeditationInput, VerseRef } from '@/types';
 
 interface MeditationFormProps {
+  initialVerseIds?: number[];
   initialBookId?: number;
   initialChapter?: number;
   initialVerse?: number;
@@ -26,7 +27,34 @@ interface MeditationFormProps {
   isSaving?: boolean;
 }
 
+function buildCompositeReference(verses: VerseRef[]): string {
+  const groups: { bookName: string; chapter: number; verseNums: number[] }[] = [];
+  for (const v of verses) {
+    const last = groups[groups.length - 1];
+    if (last && last.bookName === v.book.name && last.chapter === v.chapter) {
+      last.verseNums.push(v.verse);
+    } else {
+      groups.push({ bookName: v.book.name, chapter: v.chapter, verseNums: [v.verse] });
+    }
+  }
+
+  return groups
+    .map(g => {
+      const sorted = [...g.verseNums].sort((a, b) => a - b);
+      const isConsecutive = sorted.every((n, i) => i === 0 || n === sorted[i - 1] + 1);
+      const verseStr =
+        sorted.length === 1
+          ? String(sorted[0])
+          : isConsecutive
+            ? `${sorted[0]}-${sorted[sorted.length - 1]}`
+            : sorted.join(', ');
+      return `${g.bookName} ${g.chapter}:${verseStr}`;
+    })
+    .join('; ');
+}
+
 export function MeditationForm({
+  initialVerseIds,
   initialBookId,
   initialChapter,
   initialVerse,
@@ -36,17 +64,43 @@ export function MeditationForm({
   onSave,
   isSaving = false,
 }: MeditationFormProps) {
-  const { getVerse } = useBibleData();
+  const { getVerse, getVersesByIds } = useBibleData();
 
   const [title, setTitle] = useState(initialTitle);
   const [verseText, setVerseText] = useState(initialText);
   const [verseRef, setVerseRef] = useState<VerseRef | null>(null);
-  const [isCustom, setIsCustom] = useState(!initialBookId);
+  const [compositeRef, setCompositeRef] = useState('');
+  const [isCustom, setIsCustom] = useState(!initialBookId && !initialVerseIds?.length);
   const [isLoadingVerse, setIsLoadingVerse] = useState(false);
 
-  // Load verse from Bible params on mount
+  // Load verses via initialVerseIds (multi-select flow)
   useEffect(() => {
-    if (!initialBookId || !initialChapter || !initialVerse) return;
+    if (!initialVerseIds?.length) return;
+
+    setIsLoadingVerse(true);
+    getVersesByIds(initialVerseIds).then(refs => {
+      if (refs.length === 0) {
+        setIsLoadingVerse(false);
+        return;
+      }
+
+      if (refs.length === 1) {
+        setVerseRef(refs[0]);
+        setVerseText(refs[0].text);
+        if (!initialTitle) setTitle(refs[0].reference);
+      } else {
+        const ref = buildCompositeReference(refs);
+        setCompositeRef(ref);
+        setVerseText(refs.map(v => v.text).join('\n'));
+        if (!initialTitle) setTitle(ref);
+      }
+      setIsLoadingVerse(false);
+    });
+  }, [initialVerseIds, getVersesByIds, initialTitle]);
+
+  // Load verse from legacy single-verse params (edit flow)
+  useEffect(() => {
+    if (initialVerseIds?.length || !initialBookId || !initialChapter || !initialVerse) return;
 
     setIsLoadingVerse(true);
     getVerse(initialBookId, initialChapter, initialVerse).then(ref => {
@@ -57,20 +111,22 @@ export function MeditationForm({
       }
       setIsLoadingVerse(false);
     });
-  }, [initialBookId, initialChapter, initialVerse, getVerse, initialTitle]);
+  }, [initialVerseIds, initialBookId, initialChapter, initialVerse, getVerse, initialTitle]);
 
   const canSave = title.trim().length > 0 && verseText.trim().length > 0;
+
+  const displayRef = compositeRef || verseRef?.reference || initialRef || null;
 
   const handleSave = useCallback(async () => {
     if (!canSave || isSaving) return;
 
     await onSave({
       title: title.trim(),
-      verseRef: isCustom ? null : (verseRef?.reference ?? initialRef ?? null),
+      verseRef: isCustom ? null : (displayRef ?? null),
       verseText: verseText.trim(),
       bookId: isCustom ? null : (verseRef?.book.id ?? initialBookId ?? null),
       chapterNum: isCustom ? null : (verseRef?.chapter ?? initialChapter ?? null),
-      verseNum: isCustom ? null : (verseRef?.verse ?? initialVerse ?? null),
+      verseNum: isCustom ? null : compositeRef ? null : (verseRef?.verse ?? initialVerse ?? null),
     });
   }, [
     canSave,
@@ -78,8 +134,9 @@ export function MeditationForm({
     onSave,
     title,
     isCustom,
+    displayRef,
     verseRef,
-    initialRef,
+    compositeRef,
     verseText,
     initialBookId,
     initialChapter,
@@ -105,6 +162,7 @@ export function MeditationForm({
             onPress={() => {
               setIsCustom(true);
               setVerseRef(null);
+              setCompositeRef('');
             }}>
             <Text style={[styles.toggleLabel, isCustom && styles.toggleLabelActive]}>
               Custom text
@@ -121,7 +179,7 @@ export function MeditationForm({
             ) : (
               <View style={styles.refDisplay}>
                 <Text style={styles.refText}>
-                  {verseRef?.reference ?? initialRef ?? 'No verse selected'}
+                  {displayRef ?? 'No verse selected'}
                 </Text>
               </View>
             )}
