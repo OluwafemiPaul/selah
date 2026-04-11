@@ -1,0 +1,134 @@
+import Constants from 'expo-constants';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { SettingsRow } from '@/components/settings/settings-row';
+import { FONT_STEPS, PITCH_STEPS, RATE_STEPS, Stepper } from '@/components/settings/speed-slider';
+import { Colors, Fonts, Spacing } from '@/constants/theme';
+import { useSettings } from '@/contexts/settings-context';
+
+function SectionHeader({ title }: { title: string }) {
+  return (
+    <View style={styles.sectionHeader}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+    </View>
+  );
+}
+
+export default function SettingsScreen() {
+  const { settings, updateSetting } = useSettings();
+
+  return (
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Settings</Text>
+      </View>
+
+      <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
+        <SectionHeader title="Playback" />
+
+        <SettingsRow
+          label="Speech Speed"
+          description={`${settings.ttsRate}× — affects how fast the verse is read`}>
+          <Stepper
+            value={settings.ttsRate}
+            steps={RATE_STEPS}
+            onValueChange={v => updateSetting('ttsRate', v)}
+            format={v => `${v}×`}
+          />
+        </SettingsRow>
+
+        <SettingsRow
+          label="Speech Pitch"
+          description={`${settings.ttsPitch} — adjusts the voice pitch`}>
+          <Stepper
+            value={settings.ttsPitch}
+            steps={PITCH_STEPS}
+            onValueChange={v => updateSetting('ttsPitch', v)}
+            format={v => String(v)}
+          />
+        </SettingsRow>
+
+        <SectionHeader title="Display" />
+
+        <SettingsRow label="Verse Font Size" description={`${settings.fontSize}pt`}>
+          <Stepper
+            value={settings.fontSize}
+            steps={FONT_STEPS}
+            onValueChange={v => updateSetting('fontSize', v)}
+            format={v => `${v}pt`}
+          />
+        </SettingsRow>
+
+        <SectionHeader title="About" />
+
+        <View style={styles.aboutRow}>
+          <Text style={styles.aboutLabel}>Version</Text>
+          <Text style={styles.aboutValue}>{Constants.expoConfig?.version ?? '1.0.0'}</Text>
+        </View>
+        <View style={styles.aboutRow}>
+          <Text style={styles.aboutLabel}>Bible Translation</Text>
+          <Text style={styles.aboutValue}>KJV — King James Version</Text>
+        </View>
+        <View style={styles.aboutRow}>
+          <Text style={styles.aboutLabel}>App</Text>
+          <Text style={[styles.aboutValue, styles.italic]}>Selah</Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
+  header: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  scroll: {
+    flex: 1,
+  },
+  sectionHeader: {
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.xs,
+  },
+  sectionTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: Colors.textMuted,
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+  },
+  aboutRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  aboutLabel: {
+    fontSize: 15,
+    color: Colors.text,
+  },
+  aboutValue: {
+    fontSize: 15,
+    color: Colors.textSecondary,
+  },
+  italic: {
+    fontFamily: Fonts.serif,
+    fontStyle: 'italic',
+  },
+});
