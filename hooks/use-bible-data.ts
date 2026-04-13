@@ -2,10 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { BOOKS } from '@/constants/bible';
 import { useDB } from '@/contexts/database-context';
-import type { Book, Chapter, VerseRef } from '@/types';
+import { useSettings } from '@/contexts/settings-context';
+import type { Book, Chapter, Translation, VerseRef } from '@/types';
 
 interface UseBibleDataReturn {
   books: Book[];
+  translations: Translation[];
   loadChapters: (bookId: number) => Promise<Chapter[]>;
   loadVerses: (chapterId: number) => Promise<VerseRef[]>;
   searchVerses: (query: string) => Promise<VerseRef[]>;
@@ -15,7 +17,27 @@ interface UseBibleDataReturn {
 
 export function useBibleData(): UseBibleDataReturn {
   const { db } = useDB();
+  const { settings } = useSettings();
   const [books] = useState<Book[]>(BOOKS);
+  const [translations, setTranslations] = useState<Translation[]>([]);
+  const [translationId, setTranslationId] = useState<number>(1);
+
+  // Load available translations from DB
+  useEffect(() => {
+    if (!db) return;
+    db.getAllAsync<{ id: number; code: string; name: string }>(
+      'SELECT id, code, name FROM translations ORDER BY id'
+    ).then(rows => {
+      setTranslations(rows.map(r => ({ id: r.id, code: r.code, name: r.name })));
+    });
+  }, [db]);
+
+  // Resolve active translation code → id
+  useEffect(() => {
+    if (translations.length === 0) return;
+    const match = translations.find(t => t.code === settings.bibleTranslation);
+    setTranslationId(match?.id ?? 1);
+  }, [translations, settings.bibleTranslation]);
 
   const loadChapters = useCallback(
     async (bookId: number): Promise<Chapter[]> => {
@@ -49,9 +71,9 @@ export function useBibleData(): UseBibleDataReturn {
          FROM verses v
          JOIN books b ON v.book_id = b.id
          JOIN chapters c ON v.chapter_id = c.id
-         WHERE v.chapter_id = ?
+         WHERE v.chapter_id = ? AND v.translation_id = ?
          ORDER BY v.number`,
-        [chapterId]
+        [chapterId, translationId]
       );
       return rows.map(r => ({
         id: r.id,
@@ -67,14 +89,13 @@ export function useBibleData(): UseBibleDataReturn {
         reference: `${r.book_name} ${r.chapter_number}:${r.number}`,
       }));
     },
-    [db]
+    [db, translationId]
   );
 
   const searchVerses = useCallback(
     async (query: string): Promise<VerseRef[]> => {
       if (!db || !query.trim()) return [];
 
-      // Build FTS5 prefix query: each word gets a prefix wildcard
       const terms = query
         .trim()
         .split(/\s+/)
@@ -100,8 +121,9 @@ export function useBibleData(): UseBibleDataReturn {
          JOIN chapters c ON v.chapter_id = c.id
          JOIN books b ON v.book_id = b.id
          WHERE verses_fts MATCH ?
+           AND v.translation_id = ?
          LIMIT 50`,
-        [terms]
+        [terms, translationId]
       );
 
       return rows.map(r => ({
@@ -118,7 +140,7 @@ export function useBibleData(): UseBibleDataReturn {
         reference: `${r.book_name} ${r.chapter_number}:${r.number}`,
       }));
     },
-    [db]
+    [db, translationId]
   );
 
   const getVerse = useCallback(
@@ -135,8 +157,8 @@ export function useBibleData(): UseBibleDataReturn {
          FROM verses v
          JOIN chapters c ON v.chapter_id = c.id
          JOIN books b ON v.book_id = b.id
-         WHERE v.book_id = ? AND c.number = ? AND v.number = ?`,
-        [bookId, chapter, verse]
+         WHERE v.book_id = ? AND c.number = ? AND v.number = ? AND v.translation_id = ?`,
+        [bookId, chapter, verse, translationId]
       );
 
       if (!row) return null;
@@ -151,7 +173,7 @@ export function useBibleData(): UseBibleDataReturn {
         reference: `${row.book_name} ${chapter}:${verse}`,
       };
     },
-    [db]
+    [db, translationId]
   );
 
   const getVersesByIds = useCallback(
@@ -195,5 +217,5 @@ export function useBibleData(): UseBibleDataReturn {
     [db]
   );
 
-  return { books, loadChapters, loadVerses, searchVerses, getVerse, getVersesByIds };
+  return { books, translations, loadChapters, loadVerses, searchVerses, getVerse, getVersesByIds };
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { runMigrations } from '@/db/migrations';
 import { CREATE_TABLES } from '@/db/schema';
 import { seed } from '@/db/seed';
+import { seedBundledTranslations } from '@/db/translations';
 
 export function useDatabase() {
   const [db, setDb] = useState<SQLite.SQLiteDatabase | null>(null);
@@ -35,6 +36,14 @@ export function useDatabase() {
           // Run any pending migrations
           await runMigrations(database, row.value);
         }
+
+        // Ensure the translation index exists (column guaranteed present after seed/migration)
+        await database.execAsync(
+          'CREATE INDEX IF NOT EXISTS idx_verses_translation ON verses(translation_id, chapter_id)'
+        );
+
+        // Seed any newly added bundled translations (idempotent)
+        await seedBundledTranslations(database);
 
         if (mounted) {
           setDb(database);

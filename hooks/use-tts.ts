@@ -26,6 +26,7 @@ interface UseTTSOptions {
   text: string;
   rate?: number;
   pitch?: number;
+  voice?: string | null;
 }
 
 interface UseTTSReturn {
@@ -38,7 +39,7 @@ interface UseTTSReturn {
   canPause: boolean; // false on Android — shows stop instead
 }
 
-export function useTTS({ text, rate = 1.0, pitch = 1.0 }: UseTTSOptions): UseTTSReturn {
+export function useTTS({ text, rate = 1.0, pitch = 1.0, voice = null }: UseTTSOptions): UseTTSReturn {
   const [status, setStatus] = useState<TTSStatus>('idle');
   const [loopCount, setLoopCount] = useState(0);
 
@@ -95,6 +96,7 @@ export function useTTS({ text, rate = 1.0, pitch = 1.0 }: UseTTSOptions): UseTTS
       Speech.speak(segment, {
         rate,
         pitch,
+        ...(voice ? { voice } : {}),
         onDone: () => {
           if (!shouldLoopRef.current) return;
 
@@ -138,7 +140,7 @@ export function useTTS({ text, rate = 1.0, pitch = 1.0 }: UseTTSOptions): UseTTS
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [rate, pitch]
+    [rate, pitch, voice]
   );
 
   // Keep forward ref current whenever speakSegment changes (rate/pitch change)
@@ -161,7 +163,7 @@ export function useTTS({ text, rate = 1.0, pitch = 1.0 }: UseTTSOptions): UseTTS
       return () => clearTimeout(timeout);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, rate, pitch]);
+  }, [text, rate, pitch, voice]);
 
   const play = useCallback(() => {
     clearLoopTimeout();

@@ -51,11 +51,20 @@ export interface CreateMeditationInput {
   verseNum: number | null;
 }
 
+// Bible translation
+export interface Translation {
+  id: number;
+  code: string; // e.g. 'kjv', 'web'
+  name: string; // e.g. 'King James Version'
+}
+
 // Settings
 export interface AppSettings {
-  ttsRate: number;   // 0.25–2.0, default 1.0
-  ttsPitch: number;  // 0.5–2.0, default 1.0
-  fontSize: number;  // 14–32, default 20
+  ttsRate: number;           // 0.25–2.0, default 1.0
+  ttsPitch: number;          // 0.5–2.0, default 1.0
+  fontSize: number;          // 14–32, default 20
+  ttsVoice: string | null;   // voice identifier, null = system default
+  bibleTranslation: string;  // translation code, default 'kjv'
 }
 
 // TTS state

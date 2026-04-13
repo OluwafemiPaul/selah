@@ -4,6 +4,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SettingsRow } from '@/components/settings/settings-row';
 import { FONT_STEPS, PITCH_STEPS, RATE_STEPS, Stepper } from '@/components/settings/speed-slider';
+import { TranslationPicker } from '@/components/settings/translation-picker';
+import { VoicePicker } from '@/components/settings/voice-picker';
 import { Colors, Fonts, Spacing } from '@/constants/theme';
 import { useSettings } from '@/contexts/settings-context';
 
@@ -49,6 +51,20 @@ export default function SettingsScreen() {
           />
         </SettingsRow>
 
+        <SettingsRow
+          label="Voice"
+          description="Choose the reading voice">
+          <VoicePicker />
+        </SettingsRow>
+
+        <SectionHeader title="Bible" />
+
+        <SettingsRow
+          label="Translation"
+          description="Which version to read and browse">
+          <TranslationPicker />
+        </SettingsRow>
+
         <SectionHeader title="Display" />
 
         <SettingsRow label="Verse Font Size" description={`${settings.fontSize}pt`}>
@@ -65,10 +81,6 @@ export default function SettingsScreen() {
         <View style={styles.aboutRow}>
           <Text style={styles.aboutLabel}>Version</Text>
           <Text style={styles.aboutValue}>{Constants.expoConfig?.version ?? '1.0.0'}</Text>
-        </View>
-        <View style={styles.aboutRow}>
-          <Text style={styles.aboutLabel}>Bible Translation</Text>
-          <Text style={styles.aboutValue}>KJV — King James Version</Text>
         </View>
         <View style={styles.aboutRow}>
           <Text style={styles.aboutLabel}>App</Text>

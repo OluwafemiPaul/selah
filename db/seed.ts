@@ -1,12 +1,8 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
 import { BOOKS } from '@/constants/bible';
+import { cleanVerse } from '@/db/translations';
 import type { RawBible } from '@/types';
-
-function cleanVerse(text: string): string {
-  // Remove editorial additions in curly braces e.g. {it was}, {Heb. ...}
-  return text.replace(/\s*\{[^}]*\}/g, '').trim();
-}
 
 export async function seed(db: SQLiteDatabase): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -15,6 +11,11 @@ export async function seed(db: SQLiteDatabase): Promise<void> {
   await db.execAsync('BEGIN TRANSACTION');
 
   try {
+    // Register KJV as translation id=1
+    await db.runAsync(
+      "INSERT OR IGNORE INTO translations (id, code, name) VALUES (1, 'kjv', 'King James Version')"
+    );
+
     for (let bookIndex = 0; bookIndex < raw.length; bookIndex++) {
       const rawBook = raw[bookIndex];
       const bookMeta = BOOKS[bookIndex];
@@ -41,7 +42,7 @@ export async function seed(db: SQLiteDatabase): Promise<void> {
           const verseNumber = verseIndex + 1;
 
           const vResult = await db.runAsync(
-            'INSERT INTO verses (book_id, chapter_id, number, text) VALUES (?, ?, ?, ?)',
+            'INSERT INTO verses (book_id, chapter_id, number, text, translation_id) VALUES (?, ?, ?, ?, 1)',
             [bookMeta.id, chapterId, verseNumber, verseText]
           );
 
@@ -54,7 +55,7 @@ export async function seed(db: SQLiteDatabase): Promise<void> {
     }
 
     await db.runAsync(
-      "INSERT OR REPLACE INTO settings (key, value) VALUES ('db_version', '1')"
+      "INSERT OR REPLACE INTO settings (key, value) VALUES ('db_version', '2')"
     );
 
     await db.execAsync('COMMIT');

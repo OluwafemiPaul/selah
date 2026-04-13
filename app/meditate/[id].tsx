@@ -32,6 +32,7 @@ export default function MeditateScreen() {
     text: meditation?.verseText ?? '',
     rate: settings.ttsRate,
     pitch: settings.ttsPitch,
+    voice: settings.ttsVoice,
   });
 
   // Auto-start once meditation is loaded

@@ -1,4 +1,10 @@
 export const CREATE_TABLES = `
+  CREATE TABLE IF NOT EXISTS translations (
+    id   INTEGER PRIMARY KEY,
+    code TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL
+  );
+
   CREATE TABLE IF NOT EXISTS books (
     id        INTEGER PRIMARY KEY,
     name      TEXT NOT NULL,
@@ -13,11 +19,12 @@ export const CREATE_TABLES = `
   );
 
   CREATE TABLE IF NOT EXISTS verses (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    book_id    INTEGER NOT NULL REFERENCES books(id),
-    chapter_id INTEGER NOT NULL REFERENCES chapters(id),
-    number     INTEGER NOT NULL,
-    text       TEXT NOT NULL
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    book_id        INTEGER NOT NULL REFERENCES books(id),
+    chapter_id     INTEGER NOT NULL REFERENCES chapters(id),
+    number         INTEGER NOT NULL,
+    text           TEXT NOT NULL,
+    translation_id INTEGER NOT NULL DEFAULT 1 REFERENCES translations(id)
   );
 
   CREATE VIRTUAL TABLE IF NOT EXISTS verses_fts
