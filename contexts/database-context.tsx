@@ -1,5 +1,5 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
-import { createContext, useContext, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
 
 import { useDatabase } from '@/hooks/use-database';
 import { Colors } from '@/constants/theme';
@@ -8,11 +8,15 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 interface DatabaseContextValue {
   db: SQLiteDatabase | null;
   isReady: boolean;
+  translationsVersion: number;
+  bumpTranslationsVersion: () => void;
 }
 
 const DatabaseContext = createContext<DatabaseContextValue>({
   db: null,
   isReady: false,
+  translationsVersion: 0,
+  bumpTranslationsVersion: () => {},
 });
 
 export function useDB() {
@@ -21,6 +25,8 @@ export function useDB() {
 
 export function DatabaseProvider({ children }: { children: ReactNode }) {
   const { db, isReady, error } = useDatabase();
+  const [translationsVersion, setTranslationsVersion] = useState(0);
+  const bumpTranslationsVersion = useCallback(() => setTranslationsVersion(v => v + 1), []);
 
   if (error) {
     return (
@@ -41,7 +47,7 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <DatabaseContext.Provider value={{ db, isReady }}>
+    <DatabaseContext.Provider value={{ db, isReady, translationsVersion, bumpTranslationsVersion }}>
       {children}
     </DatabaseContext.Provider>
   );

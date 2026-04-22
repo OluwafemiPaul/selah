@@ -9,6 +9,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   fontSize: 20,
   ttsVoice: null,
   bibleTranslation: 'kjv',
+  apiBibleKey: '',
 };
 
 interface SettingsContextValue {
@@ -34,7 +35,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
     async function loadSettings() {
       const rows = await db!.getAllAsync<{ key: string; value: string }>(
-        "SELECT key, value FROM settings WHERE key IN ('tts_rate', 'tts_pitch', 'font_size', 'tts_voice', 'bible_translation')"
+        "SELECT key, value FROM settings WHERE key IN ('tts_rate', 'tts_pitch', 'font_size', 'tts_voice', 'bible_translation', 'api_bible_key')"
       );
 
       const loaded: Partial<AppSettings> = {};
@@ -44,6 +45,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         if (row.key === 'font_size') loaded.fontSize = parseInt(row.value, 10);
         if (row.key === 'tts_voice') loaded.ttsVoice = row.value === '' ? null : row.value;
         if (row.key === 'bible_translation') loaded.bibleTranslation = row.value;
+        if (row.key === 'api_bible_key') loaded.apiBibleKey = row.value;
       }
 
       setSettings(prev => ({ ...prev, ...loaded }));
@@ -61,6 +63,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         : key === 'ttsPitch' ? 'tts_pitch'
         : key === 'ttsVoice' ? 'tts_voice'
         : key === 'bibleTranslation' ? 'bible_translation'
+        : key === 'apiBibleKey' ? 'api_bible_key'
         : 'font_size';
       await db.runAsync(
         'INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)',

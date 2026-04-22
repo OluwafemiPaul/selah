@@ -54,8 +54,10 @@ export interface CreateMeditationInput {
 // Bible translation
 export interface Translation {
   id: number;
-  code: string; // e.g. 'kjv', 'web'
-  name: string; // e.g. 'King James Version'
+  code: string;           // e.g. 'kjv', 'niv'
+  name: string;           // e.g. 'King James Version'
+  bibleId: string | null; // API.Bible bible ID, null for bundled translations
+  isApi: boolean;         // true = fetched on-demand from API.Bible
 }
 
 // Settings
@@ -65,6 +67,7 @@ export interface AppSettings {
   fontSize: number;          // 14–32, default 20
   ttsVoice: string | null;   // voice identifier, null = system default
   bibleTranslation: string;  // translation code, default 'kjv'
+  apiBibleKey: string;       // scripture.api.bible API key, '' = not set
 }
 
 // TTS state

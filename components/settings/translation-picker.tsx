@@ -51,7 +51,14 @@ export function TranslationPicker() {
                 onPress={() => select(t.code)}
                 accessibilityRole="button">
                 <View style={styles.rowInfo}>
-                  <Text style={styles.rowName}>{t.name}</Text>
+                  <View style={styles.rowNameRow}>
+                    <Text style={styles.rowName}>{t.name}</Text>
+                    {t.isApi && (
+                      <View style={styles.badge}>
+                        <Text style={styles.badgeText}>Online</Text>
+                      </View>
+                    )}
+                  </View>
                   <Text style={styles.rowCode}>{t.code.toUpperCase()}</Text>
                 </View>
                 {settings.bibleTranslation === t.code && (
@@ -129,9 +136,28 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 2,
   },
+  rowNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   rowName: {
     fontSize: 15,
     color: Colors.text,
+  },
+  badge: {
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: Colors.textMuted,
+    letterSpacing: 0.3,
   },
   rowCode: {
     fontSize: 12,

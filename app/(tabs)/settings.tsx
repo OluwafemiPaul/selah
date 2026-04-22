@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ApiBibleSetup } from '@/components/settings/api-bible-setup';
 import { SettingsRow } from '@/components/settings/settings-row';
 import { FONT_STEPS, PITCH_STEPS, RATE_STEPS, Stepper } from '@/components/settings/speed-slider';
 import { TranslationPicker } from '@/components/settings/translation-picker';
@@ -63,6 +64,14 @@ export default function SettingsScreen() {
           label="Translation"
           description="Which version to read and browse">
           <TranslationPicker />
+        </SettingsRow>
+
+        <SectionHeader title="Online Translations" />
+
+        <SettingsRow
+          label="API.Bible"
+          description="Connect to unlock NKJV, NIV, NLT, AMP, and The Message">
+          <ApiBibleSetup />
         </SettingsRow>
 
         <SectionHeader title="Display" />

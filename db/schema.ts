@@ -1,8 +1,10 @@
 export const CREATE_TABLES = `
   CREATE TABLE IF NOT EXISTS translations (
-    id   INTEGER PRIMARY KEY,
-    code TEXT NOT NULL UNIQUE,
-    name TEXT NOT NULL
+    id       INTEGER PRIMARY KEY,
+    code     TEXT NOT NULL UNIQUE,
+    name     TEXT NOT NULL,
+    bible_id TEXT,
+    is_api   INTEGER NOT NULL DEFAULT 0
   );
 
   CREATE TABLE IF NOT EXISTS books (

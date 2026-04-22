@@ -32,4 +32,19 @@ export async function runMigrations(db: SQLiteDatabase, currentVersion: string):
 
     await db.runAsync("UPDATE settings SET value = '2' WHERE key = 'db_version'");
   }
+
+  if (version < 3) {
+    // Add API.Bible translation support columns to translations table.
+    // Wrapped in try/catch because new installs already have these columns via CREATE_TABLES.
+    try {
+      await db.execAsync('ALTER TABLE translations ADD COLUMN bible_id TEXT');
+    } catch {}
+    try {
+      await db.execAsync(
+        'ALTER TABLE translations ADD COLUMN is_api INTEGER NOT NULL DEFAULT 0'
+      );
+    } catch {}
+
+    await db.runAsync("UPDATE settings SET value = '3' WHERE key = 'db_version'");
+  }
 }

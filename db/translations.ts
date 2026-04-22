@@ -50,6 +50,12 @@ export const BUNDLED_TRANSLATIONS: TranslationDef[] = [
     name: 'Darby Translation',
     getData: () => require('@/assets/data/darby.json'),
   },
+  {
+    id: 6,
+    code: 'web',
+    name: 'World English Bible',
+    getData: () => require('@/assets/data/web.json'),
+  },
   // To add more translations:
   // 1. Get a JSON in thiagobodruk/bible format (array of books with nested chapter/verse arrays)
   // 2. Place it in assets/data/ (e.g. assets/data/web.json)
