@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   },
   done: {
     fontSize: 17,
-    color: Colors.text,
+    color: Colors.accent,
     fontWeight: '500',
   },
   voiceRow: {
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     fontSize: 16,
-    color: Colors.text,
+    color: Colors.accent,
     fontWeight: '600',
   },
 });

@@ -84,7 +84,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   chapterPressed: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.accentLight,
+    borderColor: Colors.accent,
   },
   chapterNumber: {
     fontSize: 16,

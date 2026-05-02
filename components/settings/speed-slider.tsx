@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: Colors.text,
+    borderColor: Colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 20,
-    color: Colors.text,
+    color: Colors.accent,
     lineHeight: 22,
   },
   buttonTextDisabled: {
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 16,
     fontWeight: '500',
-    color: Colors.text,
+    color: Colors.accent,
     minWidth: 40,
     textAlign: 'center',
   },

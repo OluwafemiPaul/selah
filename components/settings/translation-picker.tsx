@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   },
   done: {
     fontSize: 17,
-    color: Colors.text,
+    color: Colors.accent,
     fontWeight: '500',
   },
   row: {
@@ -146,9 +146,9 @@ const styles = StyleSheet.create({
     color: Colors.text,
   },
   badge: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.accentLight,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: Colors.accent,
     borderRadius: 4,
     paddingHorizontal: 5,
     paddingVertical: 1,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 10,
     fontWeight: '600',
-    color: Colors.textMuted,
+    color: Colors.accent,
     letterSpacing: 0.3,
   },
   rowCode: {
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     fontSize: 16,
-    color: Colors.text,
+    color: Colors.accent,
     fontWeight: '600',
   },
 });

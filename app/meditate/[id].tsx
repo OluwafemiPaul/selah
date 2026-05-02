@@ -121,6 +121,8 @@ const styles = StyleSheet.create({
     zIndex: 10,
     width: 32,
     height: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -132,7 +134,7 @@ const styles = StyleSheet.create({
     color: Colors.textMuted,
   },
   counterContainer: {
-    paddingBottom: Spacing.sm,
+    paddingBottom: Spacing.md,
     alignItems: 'center',
   },
 });

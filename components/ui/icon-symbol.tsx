@@ -30,7 +30,11 @@ const MAPPING = {
   'arrow.left': 'arrow-back',
   'xmark': 'close',
   'magnifyingglass': 'search',
-} as IconMapping;
+  'bookmark.fill': 'bookmark',
+  'bookmark': 'bookmark-border',
+  'circle.fill': 'lens',
+  'circle': 'radio-button-unchecked',
+} as unknown as IconMapping;
 
 /**
  * An icon component that uses native SF Symbols on iOS, and Material Icons on Android and web.

@@ -55,7 +55,7 @@ export async function seed(db: SQLiteDatabase): Promise<void> {
     }
 
     await db.runAsync(
-      "INSERT OR REPLACE INTO settings (key, value) VALUES ('db_version', '3')"
+      "INSERT OR REPLACE INTO settings (key, value) VALUES ('db_version', '5')"
     );
 
     await db.execAsync('COMMIT');

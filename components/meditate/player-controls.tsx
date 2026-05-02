@@ -36,7 +36,7 @@ export function PlayerControls({ status, canPause, onToggle, onStop }: PlayerCon
         <IconSymbol
           name={isPlaying ? 'pause.fill' : 'play.fill'}
           size={28}
-          color={Colors.background}
+          color={Colors.accentText}
         />
       </Pressable>
 
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: Colors.text,
+    backgroundColor: Colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },

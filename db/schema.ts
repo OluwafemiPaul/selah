@@ -48,4 +48,19 @@ export const CREATE_TABLES = `
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS bookmarks (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    verse_id       INTEGER NOT NULL UNIQUE,
+    translation_id INTEGER NOT NULL,
+    created_at     INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS highlights (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    verse_id       INTEGER NOT NULL UNIQUE,
+    translation_id INTEGER NOT NULL,
+    color          TEXT NOT NULL,
+    created_at     INTEGER NOT NULL
+  );
 `;

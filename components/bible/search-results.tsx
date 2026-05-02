@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
-import type { VerseRef } from '@/types';
+import { useBookmarks } from '@/contexts/bookmarks-context';
+import { HIGHLIGHT_COLORS, useHighlights } from '@/contexts/highlights-context';
+import type { HighlightColor, VerseRef } from '@/types';
 
 interface SearchResultsProps {
   results: VerseRef[];
@@ -21,6 +25,9 @@ export function SearchResults({
   onConfirm,
 }: SearchResultsProps) {
   const count = selectedIds.size;
+  const { isBookmarked, addBookmark, removeBookmark } = useBookmarks();
+  const { getHighlight, setHighlight, removeHighlight } = useHighlights();
+  const [pickerVerseId, setPickerVerseId] = useState<number | null>(null);
 
   if (isLoading) {
     return (
@@ -46,23 +53,76 @@ export function SearchResults({
         contentContainerStyle={[styles.content, count > 0 && styles.contentWithFooter]}
         renderItem={({ item }) => {
           const isSelected = selectedIds.has(item.id);
+          const bookmarked = isBookmarked(item.id);
+          const highlight = getHighlight(item.id);
           return (
             <Pressable
               style={({ pressed }) => [
                 styles.resultRow,
                 isSelected && styles.resultSelected,
+                !isSelected && highlight && { backgroundColor: HIGHLIGHT_COLORS[highlight].bg },
                 pressed && !isSelected && styles.resultPressed,
               ]}
-              onPress={() => onToggleVerse(item)}>
+              onPress={() => {
+                if (pickerVerseId !== null) { setPickerVerseId(null); return; }
+                onToggleVerse(item);
+              }}>
               <View style={styles.resultHeader}>
                 <Text style={styles.reference}>{item.reference}</Text>
-                <View style={[styles.indicator, isSelected && styles.indicatorSelected]}>
-                  {isSelected && <Text style={styles.indicatorCheck}>✓</Text>}
+                <View style={styles.resultActions}>
+                  <Pressable
+                    hitSlop={10}
+                    onPress={() => setPickerVerseId(pickerVerseId === item.id ? null : item.id)}
+                    accessibilityLabel="Highlight verse">
+                    <IconSymbol
+                      name={highlight ? 'circle.fill' : 'circle'}
+                      size={14}
+                      color={highlight ? HIGHLIGHT_COLORS[highlight].border : Colors.border}
+                    />
+                  </Pressable>
+                  <Pressable
+                    hitSlop={10}
+                    onPress={() => bookmarked ? removeBookmark(item.id) : addBookmark(item)}
+                    accessibilityLabel={bookmarked ? 'Remove bookmark' : 'Bookmark verse'}>
+                    <IconSymbol
+                      name={bookmarked ? 'bookmark.fill' : 'bookmark'}
+                      size={16}
+                      color={bookmarked ? Colors.accent : Colors.textMuted}
+                    />
+                  </Pressable>
+                  <View style={[styles.indicator, isSelected && styles.indicatorSelected]}>
+                    {isSelected && <Text style={styles.indicatorCheck}>✓</Text>}
+                  </View>
                 </View>
               </View>
               <Text style={styles.verseText} numberOfLines={3}>
                 {item.text}
               </Text>
+              {pickerVerseId === item.id && (
+                <View style={styles.colorPicker}>
+                  {(['yellow', 'green', 'blue', 'pink', 'purple'] as HighlightColor[]).map(c => (
+                    <Pressable
+                      key={c}
+                      hitSlop={6}
+                      onPress={() => { void setHighlight(item, c); setPickerVerseId(null); }}>
+                      <View style={[
+                        styles.colorSwatch,
+                        { backgroundColor: HIGHLIGHT_COLORS[c].bg, borderColor: HIGHLIGHT_COLORS[c].border },
+                        highlight === c && styles.colorSwatchActive,
+                      ]} />
+                    </Pressable>
+                  ))}
+                  {highlight && (
+                    <Pressable
+                      hitSlop={6}
+                      onPress={() => { void removeHighlight(item.id); setPickerVerseId(null); }}>
+                      <View style={styles.colorRemove}>
+                        <Text style={styles.colorRemoveText}>✕</Text>
+                      </View>
+                    </Pressable>
+                  )}
+                </View>
+              )}
             </Pressable>
           );
         }}
@@ -111,7 +171,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   resultSelected: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.accentLight,
   },
   resultPressed: {
     backgroundColor: Colors.surface,
@@ -120,6 +180,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  resultActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
   },
   reference: {
     fontSize: 12,
@@ -139,11 +204,11 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   indicatorSelected: {
-    backgroundColor: Colors.text,
-    borderColor: Colors.text,
+    backgroundColor: Colors.accent,
+    borderColor: Colors.accent,
   },
   indicatorCheck: {
-    color: Colors.background,
+    color: Colors.accentText,
     fontSize: 11,
     fontWeight: '700',
     lineHeight: 14,
@@ -154,15 +219,48 @@ const styles = StyleSheet.create({
     color: Colors.text,
     lineHeight: 20,
   },
+  colorPicker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    paddingTop: Spacing.sm,
+    marginTop: Spacing.xs,
+    borderTopWidth: 1,
+    borderTopColor: Colors.border,
+  },
+  colorSwatch: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 2,
+  },
+  colorSwatchActive: {
+    borderWidth: 3.5,
+  },
+  colorRemove: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.surface,
+  },
+  colorRemoveText: {
+    fontSize: 10,
+    color: Colors.textMuted,
+    lineHeight: 12,
+  },
   footer: {
     padding: Spacing.md,
     paddingBottom: Spacing.lg,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.surfaceRaised,
   },
   confirmButton: {
-    backgroundColor: Colors.text,
+    backgroundColor: Colors.accent,
     borderRadius: Radius.md,
     paddingVertical: Spacing.md,
     alignItems: 'center',
@@ -173,7 +271,7 @@ const styles = StyleSheet.create({
   confirmLabel: {
     fontSize: 15,
     fontWeight: '600',
-    color: Colors.background,
+    color: Colors.accentText,
     letterSpacing: 0.3,
   },
 });

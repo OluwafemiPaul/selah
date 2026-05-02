@@ -225,7 +225,7 @@ export function MeditationForm({
           onPress={handleSave}
           disabled={!canSave || isSaving}>
           {isSaving ? (
-            <ActivityIndicator color={Colors.background} />
+            <ActivityIndicator color={Colors.accentText} />
           ) : (
             <Text style={styles.saveLabel}>Save</Text>
           )}
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
   },
   toggleActive: {
-    backgroundColor: Colors.text,
+    backgroundColor: Colors.accent,
   },
   toggleLabel: {
     fontSize: 14,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   toggleLabelActive: {
-    color: Colors.background,
+    color: Colors.accentText,
   },
   field: {
     gap: Spacing.xs,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     fontSize: 16,
     color: Colors.text,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.surface,
   },
   textArea: {
     fontFamily: Fonts.serif,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
     marginVertical: Spacing.sm,
   },
   saveButton: {
-    backgroundColor: Colors.text,
+    backgroundColor: Colors.accent,
     borderRadius: Radius.md,
     paddingVertical: Spacing.md,
     alignItems: 'center',
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   saveLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.background,
+    color: Colors.accentText,
     letterSpacing: 0.3,
   },
 });

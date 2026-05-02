@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { EmptyLibrary } from '@/components/library/empty-library';
 import { MeditationCard } from '@/components/library/meditation-card';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors, Fonts, Spacing } from '@/constants/theme';
+import { Colors, Fonts, Shadows, Spacing } from '@/constants/theme';
 import { useMeditation } from '@/hooks/use-meditation';
 import type { Meditation } from '@/types';
 
@@ -44,7 +44,7 @@ export default function LibraryScreen() {
           onPress={() => router.push('/meditation/new')}
           accessibilityLabel="Add meditation"
           hitSlop={8}>
-          <IconSymbol name="plus" size={22} color={Colors.text} />
+          <IconSymbol name="plus" size={22} color={Colors.accent} />
         </Pressable>
       </View>
 
@@ -81,20 +81,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    backgroundColor: Colors.surfaceRaised,
+    ...Shadows.sm,
   },
   wordmark: {
-    fontSize: 28,
+    fontSize: 34,
     fontFamily: Fonts.serif,
     fontStyle: 'italic',
     fontWeight: '700',
     color: Colors.text,
-    letterSpacing: -0.5,
+    letterSpacing: 0.5,
   },
   addButton: {
     width: 36,
     height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.accentLight,
     alignItems: 'center',
     justifyContent: 'center',
   },

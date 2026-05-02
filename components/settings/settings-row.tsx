@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
+    backgroundColor: Colors.surfaceRaised,
     gap: Spacing.sm,
   },
   labelGroup: {

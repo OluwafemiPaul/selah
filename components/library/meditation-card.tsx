@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
+import { Colors, Fonts, Radius, Shadows, Spacing } from '@/constants/theme';
 import type { Meditation } from '@/types';
 
 interface MeditationCardProps {
@@ -65,13 +65,14 @@ export function MeditationCard({ meditation, onPress, onEdit, onDelete }: Medita
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.surfaceRaised,
     borderWidth: 1,
     borderColor: Colors.border,
     borderRadius: Radius.md,
     padding: Spacing.md,
     marginHorizontal: Spacing.md,
     marginBottom: Spacing.sm,
+    ...Shadows.sm,
   },
   cardPressed: {
     opacity: 0.7,
@@ -124,7 +125,7 @@ const styles = StyleSheet.create({
   actionButton: {
     paddingVertical: 4,
     paddingHorizontal: 12,
-    backgroundColor: Colors.text,
+    backgroundColor: Colors.accent,
     borderRadius: Radius.sm,
   },
   actionPressed: {
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
   meditateLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: Colors.background,
+    color: Colors.accentText,
     letterSpacing: 0.3,
   },
   actionRight: {

@@ -39,8 +39,10 @@ const styles = StyleSheet.create({
   input: {
     height: 40,
     backgroundColor: Colors.surface,
-    borderRadius: Radius.sm,
-    paddingHorizontal: Spacing.md,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.lg,
     fontSize: 15,
     color: Colors.text,
   },

@@ -60,6 +60,25 @@ export interface Translation {
   isApi: boolean;         // true = fetched on-demand from API.Bible
 }
 
+// Bookmarks
+export interface Bookmark {
+  id: number;
+  verseId: number;
+  translationId: number;
+  createdAt: number;
+}
+
+// Highlights
+export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'purple';
+
+export interface Highlight {
+  id: number;
+  verseId: number;
+  translationId: number;
+  color: HighlightColor;
+  createdAt: number;
+}
+
 // Settings
 export interface AppSettings {
   ttsRate: number;           // 0.25–2.0, default 1.0

@@ -47,4 +47,33 @@ export async function runMigrations(db: SQLiteDatabase, currentVersion: string):
 
     await db.runAsync("UPDATE settings SET value = '3' WHERE key = 'db_version'");
   }
+
+  if (version < 4) {
+    try {
+      await db.execAsync(`
+        CREATE TABLE IF NOT EXISTS bookmarks (
+          id             INTEGER PRIMARY KEY AUTOINCREMENT,
+          verse_id       INTEGER NOT NULL UNIQUE,
+          translation_id INTEGER NOT NULL,
+          created_at     INTEGER NOT NULL
+        );
+      `);
+    } catch {}
+    await db.runAsync("UPDATE settings SET value = '4' WHERE key = 'db_version'");
+  }
+
+  if (version < 5) {
+    try {
+      await db.execAsync(`
+        CREATE TABLE IF NOT EXISTS highlights (
+          id             INTEGER PRIMARY KEY AUTOINCREMENT,
+          verse_id       INTEGER NOT NULL UNIQUE,
+          translation_id INTEGER NOT NULL,
+          color          TEXT NOT NULL,
+          created_at     INTEGER NOT NULL
+        );
+      `);
+    } catch {}
+    await db.runAsync("UPDATE settings SET value = '5' WHERE key = 'db_version'");
+  }
 }

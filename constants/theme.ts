@@ -1,17 +1,38 @@
 import { Platform } from 'react-native';
 
 export const Colors = {
-  background: '#FFFFFF',
-  surface: '#F8F8F8',
-  border: '#EEEEEE',
-  text: '#000000',
-  textSecondary: '#555555',
-  textMuted: '#999999',
-  tint: '#000000',
-  icon: '#888888',
-  tabIconDefault: '#AAAAAA',
-  tabIconSelected: '#000000',
-  destructive: '#CC0000',
+  background: '#F9F6F1',
+  surface: '#EDE8E0',
+  surfaceRaised: '#FFFFFF',
+  border: '#DDD6CB',
+  text: '#1C1917',
+  textSecondary: '#735F52',
+  textMuted: '#A8948A',
+  accent: '#5046E5',
+  accentLight: '#EEF0FF',
+  accentText: '#FFFFFF',
+  tint: '#5046E5',
+  icon: '#8C7B6E',
+  tabIconDefault: '#B8A99A',
+  tabIconSelected: '#5046E5',
+  destructive: '#DC2626',
+};
+
+export const Shadows = {
+  sm: {
+    shadowColor: '#1C1917',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.07,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: '#1C1917',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.10,
+    shadowRadius: 10,
+    elevation: 5,
+  },
 };
 
 export const Fonts = {

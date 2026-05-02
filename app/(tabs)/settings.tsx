@@ -7,7 +7,7 @@ import { SettingsRow } from '@/components/settings/settings-row';
 import { FONT_STEPS, PITCH_STEPS, RATE_STEPS, Stepper } from '@/components/settings/speed-slider';
 import { TranslationPicker } from '@/components/settings/translation-picker';
 import { VoicePicker } from '@/components/settings/voice-picker';
-import { Colors, Fonts, Spacing } from '@/constants/theme';
+import { Colors, Fonts, Shadows, Spacing } from '@/constants/theme';
 import { useSettings } from '@/contexts/settings-context';
 
 function SectionHeader({ title }: { title: string }) {
@@ -108,8 +108,8 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    backgroundColor: Colors.surfaceRaised,
+    ...Shadows.sm,
   },
   title: {
     fontSize: 28,
@@ -139,6 +139,7 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: Colors.border,
+    backgroundColor: Colors.surfaceRaised,
   },
   aboutLabel: {
     fontSize: 15,

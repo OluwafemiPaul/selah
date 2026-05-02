@@ -3,7 +3,9 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
+import { BookmarksProvider } from '@/contexts/bookmarks-context';
 import { DatabaseProvider } from '@/contexts/database-context';
+import { HighlightsProvider } from '@/contexts/highlights-context';
 import { SettingsProvider } from '@/contexts/settings-context';
 
 export const unstable_settings = {
@@ -14,10 +16,10 @@ const LightTheme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    background: '#FFFFFF',
+    background: '#F9F6F1',
     card: '#FFFFFF',
-    text: '#000000',
-    border: '#EEEEEE',
+    text: '#1C1917',
+    border: '#DDD6CB',
   },
 };
 
@@ -26,6 +28,8 @@ export default function RootLayout() {
     <ThemeProvider value={LightTheme}>
       <DatabaseProvider>
         <SettingsProvider>
+          <BookmarksProvider>
+          <HighlightsProvider>
           <Stack>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen
@@ -38,7 +42,7 @@ export default function RootLayout() {
                 title: 'New Meditation',
                 presentation: 'modal',
                 headerStyle: { backgroundColor: '#FFFFFF' },
-                headerTitleStyle: { color: '#000000', fontWeight: '600' },
+                headerTitleStyle: { color: '#1C1917', fontWeight: '600' },
               }}
             />
             <Stack.Screen
@@ -47,11 +51,13 @@ export default function RootLayout() {
                 title: 'Edit Meditation',
                 presentation: 'modal',
                 headerStyle: { backgroundColor: '#FFFFFF' },
-                headerTitleStyle: { color: '#000000', fontWeight: '600' },
+                headerTitleStyle: { color: '#1C1917', fontWeight: '600' },
               }}
             />
           </Stack>
           <StatusBar style="dark" />
+          </HighlightsProvider>
+          </BookmarksProvider>
         </SettingsProvider>
       </DatabaseProvider>
     </ThemeProvider>

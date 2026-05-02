@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   },
   symbol: {
     fontSize: 40,
-    color: Colors.border,
+    color: Colors.accent,
     marginBottom: Spacing.sm,
   },
   heading: {
@@ -50,8 +50,7 @@ const styles = StyleSheet.create({
   cta: {
     fontSize: 15,
     fontWeight: '600',
-    color: Colors.text,
-    textDecorationLine: 'underline',
+    color: Colors.accent,
     marginTop: Spacing.sm,
   },
 });

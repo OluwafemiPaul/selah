@@ -13,9 +13,13 @@ export default function TabLayout() {
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
-          backgroundColor: Colors.background,
+          backgroundColor: Colors.surfaceRaised,
           borderTopColor: Colors.border,
-          elevation: 0,
+          shadowColor: '#1C1917',
+          shadowOffset: { width: 0, height: -1 },
+          shadowOpacity: 0.06,
+          shadowRadius: 6,
+          elevation: 4,
         },
       }}>
       <Tabs.Screen
@@ -30,6 +34,13 @@ export default function TabLayout() {
         options={{
           title: 'Bible',
           tabBarIcon: ({ color }) => <IconSymbol size={26} name="book.fill" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="saved"
+        options={{
+          title: 'Saved',
+          tabBarIcon: ({ color }) => <IconSymbol size={26} name="bookmark.fill" color={color} />,
         }}
       />
       <Tabs.Screen

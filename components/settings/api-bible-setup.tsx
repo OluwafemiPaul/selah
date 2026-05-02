@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   button: {
-    backgroundColor: Colors.text,
+    backgroundColor: Colors.accent,
     paddingHorizontal: Spacing.md,
     paddingVertical: 10,
     borderRadius: Radius.sm,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.background,
+    color: Colors.accentText,
   },
   buttonOutline: {
     borderWidth: 1,
