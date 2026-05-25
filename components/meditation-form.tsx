@@ -11,6 +11,8 @@ import {
   View,
 } from 'react-native';
 
+import { IconSymbol } from '@/components/ui/icon-symbol';
+import { VersePickerModal } from '@/components/bible/verse-picker-modal';
 import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
 import { useBibleData } from '@/hooks/use-bible-data';
 import type { CreateMeditationInput, VerseRef } from '@/types';
@@ -70,8 +72,11 @@ export function MeditationForm({
   const [verseText, setVerseText] = useState(initialText);
   const [verseRef, setVerseRef] = useState<VerseRef | null>(null);
   const [compositeRef, setCompositeRef] = useState('');
-  const [isCustom, setIsCustom] = useState(!initialBookId && !initialVerseIds?.length);
+  // Default to "Bible verse" mode. Only switch to "Custom" when editing an
+  // existing custom meditation — i.e. it has saved text but no verse reference.
+  const [isCustom, setIsCustom] = useState(!!initialText && !initialRef);
   const [isLoadingVerse, setIsLoadingVerse] = useState(false);
+  const [showPicker, setShowPicker] = useState(false);
 
   // Load verses via initialVerseIds (multi-select flow)
   useEffect(() => {
@@ -116,6 +121,22 @@ export function MeditationForm({
   const canSave = title.trim().length > 0 && verseText.trim().length > 0;
 
   const displayRef = compositeRef || verseRef?.reference || initialRef || null;
+
+  function handleVersesSelected(selected: VerseRef[]) {
+    if (selected.length === 1) {
+      const v = selected[0];
+      setVerseRef(v);
+      setCompositeRef('');
+      setVerseText(v.text);
+      setTitle(prev => (!prev || prev === displayRef) ? v.reference : prev);
+    } else {
+      const ref = buildCompositeReference(selected);
+      setCompositeRef(ref);
+      setVerseRef(null);
+      setVerseText(selected.map(v => v.text).join('\n'));
+      setTitle(prev => (!prev || prev === displayRef) ? ref : prev);
+    }
+  }
 
   const handleSave = useCallback(async () => {
     if (!canSave || isSaving) return;
@@ -170,18 +191,22 @@ export function MeditationForm({
           </Pressable>
         </View>
 
-        {/* Verse reference (read-only if from Bible) */}
+        {/* Verse reference — tappable to open Bible picker */}
         {!isCustom && (
           <View style={styles.field}>
             <Text style={styles.fieldLabel}>Verse reference</Text>
             {isLoadingVerse ? (
               <ActivityIndicator style={styles.loader} color={Colors.textMuted} />
             ) : (
-              <View style={styles.refDisplay}>
-                <Text style={styles.refText}>
-                  {displayRef ?? 'No verse selected'}
+              <Pressable
+                style={({ pressed }) => [styles.refDisplay, pressed && styles.refPressed]}
+                onPress={() => setShowPicker(true)}
+                accessibilityLabel="Choose a verse">
+                <Text style={[styles.refText, !displayRef && styles.refPlaceholder]}>
+                  {displayRef ?? 'Tap to choose a verse…'}
                 </Text>
-              </View>
+                <IconSymbol name="chevron.right" size={16} color={Colors.textMuted} />
+              </Pressable>
             )}
           </View>
         )}
@@ -231,6 +256,12 @@ export function MeditationForm({
           )}
         </Pressable>
       </ScrollView>
+
+      <VersePickerModal
+        visible={showPicker}
+        onClose={() => setShowPicker(false)}
+        onConfirm={handleVersesSelected}
+      />
     </KeyboardAvoidingView>
   );
 }
@@ -300,6 +331,9 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   refDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: Colors.border,
     borderRadius: Radius.sm,
@@ -307,11 +341,20 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     backgroundColor: Colors.surface,
   },
+  refPressed: {
+    opacity: 0.7,
+  },
   refText: {
+    flex: 1,
     fontSize: 15,
     fontFamily: Fonts.serif,
     fontStyle: 'italic',
     color: Colors.textSecondary,
+    marginRight: Spacing.sm,
+  },
+  refPlaceholder: {
+    color: Colors.textMuted,
+    fontStyle: 'normal',
   },
   loader: {
     alignSelf: 'flex-start',
